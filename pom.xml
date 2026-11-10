@@ -31,7 +31,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-          <mainClass>com.example.App</mainClass>
+          <mainClass>com.lab2.Lab2Editor</mainClass>
         </configuration>
       </plugin>
     </plugins>
