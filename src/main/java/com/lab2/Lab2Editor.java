@@ -55,7 +55,7 @@ public class Lab2Editor extends Application {
             int currentX = (int) e.getX();
             int currentY = (int) e.getY();
 
-            // Гумовий слід
+            // колір слід
             gc.setStroke(Color.BLUE);
             gc.setLineWidth(1);
 
