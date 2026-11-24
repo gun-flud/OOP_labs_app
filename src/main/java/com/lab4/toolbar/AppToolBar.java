@@ -3,7 +3,7 @@ package com.lab4.toolbar;
 import com.lab4.docs.StudentInfo;
 import com.lab4.shapes.ShapeType;
 import com.lab4.util.ZoomHandler;
-import com.lab4.util.ZoomHandlerFactory;
+import com.lab4.workspace.WorkspaceView;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -20,12 +20,14 @@ public class AppToolBar {
     private final ToggleGroup toolGroup = new ToggleGroup();
     private final MenuButton shapesMenuButton;
 
-    public AppToolBar(Stage stage, Consumer<ShapeType> onToolSelected, Canvas canvas) {
+    public AppToolBar(
+            Stage stage,
+            Consumer<ShapeType> onToolSelected,
+            ZoomHandler zoomHandler,
+            WorkspaceView workspaceView) {
+
         toolBar = new ToolBar();
         toolBar.setPadding(new Insets(3, 5, 3, 5));
-
-        // 1. кнопки навігації (вимикають малювання фігур)
-        ZoomHandler zoomHandler = new ZoomHandler(canvas);
 
         ToggleButton zoomInBtn = new ToggleButton();
         zoomInBtn.setToggleGroup(toolGroup);
@@ -33,8 +35,8 @@ public class AppToolBar {
         zoomInBtn.setTooltip(new Tooltip("Збільшити"));
         zoomInBtn.setPrefSize(32, 32);
         zoomInBtn.setOnAction(e -> {
-                    zoomHandler.zoomIn();
-            stage.setTitle("Графічний редактор (Іванников В., гр. ІМ-54) | Масштаб: " + (int)(zoomHandler.getCurrentScale() * 100) + "%");
+            zoomHandler.zoomIn();
+            stage.setTitle("Графічний редактор (Іванников В., гр. ІМ-54) | Масштаб: " + (int) (zoomHandler.getCurrentScale() * 100) + "%");
         });
 
         ToggleButton zoomOutBtn = new ToggleButton();
@@ -43,7 +45,7 @@ public class AppToolBar {
         zoomOutBtn.setTooltip(new Tooltip("Зменшити"));
         zoomOutBtn.setPrefSize(32, 32);
         zoomOutBtn.setOnAction(e -> {
-            onToolSelected.accept(null);
+            zoomHandler.zoomOut();
             stage.setTitle("Графічний редактор (Іванников В., гр. ІМ-54) | Інструмент: Зменшити (малювання вимкнено)");
         });
 
@@ -54,6 +56,7 @@ public class AppToolBar {
         handBtn.setPrefSize(32, 32);
         handBtn.setOnAction(e -> {
             onToolSelected.accept(null);
+            workspaceView.enableHandTool();
             stage.setTitle("Графічний редактор (Іванников В., гр. ІМ-54) | Інструмент: Рука (малювання вимкнено)");
         });
 
@@ -66,7 +69,10 @@ public class AppToolBar {
         for (ShapeType type : ShapeType.values()) {
             MenuItem item = new MenuItem(type.getUkrainianName());
             item.setGraphic(createMiniShapeIcon(type));
-            item.setOnAction(e -> selectShape(type, stage, onToolSelected));
+            item.setOnAction(e -> {
+                workspaceView.enableDrawingTool();
+                selectShape(type, stage, onToolSelected);
+            });
             shapesMenuButton.getItems().add(item);
         }
 
@@ -155,7 +161,8 @@ public class AppToolBar {
                 // кружечки на кінцях
                 gc.strokeOval(1, 11, 4, 4);
                 gc.strokeOval(11, 1, 4, 4);
-                break;        }
+                break;
+        }
         return c;
     }
 }

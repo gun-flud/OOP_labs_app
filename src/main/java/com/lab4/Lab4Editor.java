@@ -2,6 +2,9 @@ package com.lab4;
 
 import com.lab4.menu.AppMenuBar;
 import com.lab4.toolbar.AppToolBar;
+import com.lab4.util.ZoomHandler;
+import com.lab4.workspace.WorkspaceFactory;
+import com.lab4.workspace.WorkspaceView;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -21,21 +24,32 @@ public class Lab4Editor extends Application {
 
         this.myEditor = new MyEditor(canvas);
 
+        ScrollPane workspace = WorkspaceFactory.createWorkspace(canvas);
+
+        ZoomHandler zoomHandler = new ZoomHandler(canvas, workspace);
+        zoomHandler.attachScrollEvent(workspace);
+
+        WorkspaceView workspaceView = new WorkspaceView(workspace, canvas);
+
         // меню та тулбар
         AppMenuBar menuBar = new AppMenuBar(primaryStage);
-        AppToolBar toolBar = new AppToolBar(primaryStage, myEditor::setTool, canvas);
+        AppToolBar toolBar = new AppToolBar(
+                primaryStage,
+                myEditor::setTool,
+                zoomHandler,
+                workspaceView);
 
         VBox topPanel = new VBox(menuBar.getMenuBar(), toolBar.getToolBar());
 
-        Group canvasGroup = new Group(canvas);
-        ScrollPane scrollPane = new ScrollPane(canvasGroup);
-        scrollPane.setPannable(true);
+//        Group canvasGroup = new Group(canvas);
+//        ScrollPane scrollPane = new ScrollPane(canvasGroup);
+//        scrollPane.setPannable(true);
 
         root.setTop(topPanel);
-        root.setCenter(scrollPane);
+        root.setCenter(workspace);
 
 
-        Scene scene = new Scene(root, 800, 560);
+        Scene scene = new Scene(root, 1000, 700);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
